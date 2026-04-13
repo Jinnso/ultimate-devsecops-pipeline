@@ -41,8 +41,9 @@ RUN adduser --disabled-password --gecos '' appuser
 COPY --from=builder /app/wheels /wheels
 COPY --from=builder /app/requirements.txt .
 
-# 3. Instalar las dependencias usando los archivos locales, sin descargar de internet
-RUN pip install --no-cache /wheels/*
+# 3. Actualizar las herramientas base de Python y luego instalar nuestras dependencias
+RUN pip install --no-cache-dir --upgrade pip setuptools \
+    && pip install --no-cache /wheels/*
 
 # 4. Copiar el código fuente de nuestra aplicación
 COPY main.py .
