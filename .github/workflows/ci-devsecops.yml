@@ -60,31 +60,37 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      # --- NUEVO PASO: Convertir nombre a minúsculas ---
+      - name: Formatear nombre del repositorio a minúsculas
+        run: |
+          echo "REPO_MINUSCULAS=${GITHUB_REPOSITORY,,}" >> ${GITHUB_ENV}
+
       - name: 4c. Build and export to Docker
         uses: docker/build-push-action@v5
         with:
           context: .
-          load: true # Carga la imagen localmente para escanearla antes de subirla
-          tags: ghcr.io/${{ github.repository }}/myapp:${{ github.sha }}
+          load: true 
+          # Usamos la nueva variable en minúsculas
+          tags: ghcr.io/${{ env.REPO_MINUSCULAS }}/myapp:${{ github.sha }}
 
       # --- 5. CONTAINER SECURITY SCAN ---
       - name: 5a. Scan Docker image with Trivy
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: 'ghcr.io/${{ github.repository }}/myapp:${{ github.sha }}'
+          image-ref: 'ghcr.io/${{ env.REPO_MINUSCULAS }}/myapp:${{ github.sha }}'
           format: 'table'
-          exit-code: '1' # Falla el pipeline si encuentra vulnerabilidades CRÍTICAS
+          exit-code: '1' 
           ignore-unfixed: true
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
 
       # --- 6. PUSH ---
       - name: 6a. Push to GHCR
-        if: success() # Solo sube la imagen si todos los pasos y escaneos pasaron
+        if: success() 
         uses: docker/build-push-action@v5
         with:
           context: .
           push: true
           tags: |
-            ghcr.io/${{ github.repository }}/myapp:${{ github.sha }}
-            ghcr.io/${{ github.repository }}/myapp:latest
+            ghcr.io/${{ env.REPO_MINUSCULAS }}/myapp:${{ github.sha }}
+            ghcr.io/${{ env.REPO_MINUSCULAS }}/myapp:latest
