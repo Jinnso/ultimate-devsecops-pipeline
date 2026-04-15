@@ -8,6 +8,6 @@ spec:
     app: devsecops-demo
   ports:
     - protocol: TCP
-      port: 80
+      port: 8080
       targetPort: 8000 # El puerto que expusimos en nuestro Dockerfile
   type: LoadBalancer # Solo accesible dentro del clúster por ahora(CLusterIP) #2 Cambiado a LoadBalancer para prueba de app y argocd
