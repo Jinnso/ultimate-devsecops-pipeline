@@ -7,15 +7,23 @@ spec:
   template:
     spec:
       containers:
-      - name: zap-scanner
-        image: zaproxy/zap-stable
-        # zap-baseline.py es un script oficial de ZAP optimizado para CI/CD
-        command: ["zap-baseline.py"]
-        args: 
-          # Atacamos al DNS interno que Kubernetes le asignó a tu aplicación
-          - "-t"
-          - "http://devsecops-demo-service:8080"
-          # -I significa que solo reporte, pero no falle con error si encuentra advertencias
-          - "-I" 
+        - name: zap-scanner
+          image: zaproxy/zap-stable
+          # zap-baseline.py es un script oficial de ZAP optimizado para CI/CD
+          command: ["zap-baseline.py"]
+          args:
+            # Atacamos al DNS interno que Kubernetes le asignó a tu aplicación
+            - "-t"
+            - "http://devsecops-demo-service:8080"
+            # -I significa que solo reporte, pero no falle con error si encuentra advertencias
+            - "-I"
+            # --- NUEVO: Montamos la carpeta que ZAP necesita ---
+          volumeMounts:
+            - name: zap-workdir
+              mountPath: /zap/wrk
       restartPolicy: Never
+      # --- NUEVO: Creamos el volumen temporal ---
+      volumes:
+        - name: zap-workdir
+          emptyDir: {}
   backoffLimit: 1
