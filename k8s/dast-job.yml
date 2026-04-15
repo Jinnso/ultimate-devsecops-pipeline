@@ -1,0 +1,21 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: zap-dast-scan
+  namespace: default
+spec:
+  template:
+    spec:
+      containers:
+      - name: zap-scanner
+        image: zaproxy/zap-stable
+        # zap-baseline.py es un script oficial de ZAP optimizado para CI/CD
+        command: ["zap-baseline.py"]
+        args: 
+          # Atacamos al DNS interno que Kubernetes le asignó a tu aplicación
+          - "-t"
+          - "http://devsecops-demo-service:8080"
+          # -I significa que solo reporte, pero no falle con error si encuentra advertencias
+          - "-I" 
+      restartPolicy: Never
+  backoffLimit: 1
