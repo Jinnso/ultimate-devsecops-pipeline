@@ -1,0 +1,17 @@
+alertmanager:
+  config:
+    global:
+      resolve_timeout: 5m
+    route:
+      group_by: ['alertname', 'job']
+      group_wait: 30s
+      group_interval: 5m
+      repeat_interval: 12h
+      # Le decimos que la ruta por defecto es Telegram
+      receiver: 'telegram-bot' 
+    receivers:
+    - name: 'telegram-bot'
+      telegram_configs:
+      - bot_token: '8760734181:AAEwDoB9prrqJXG57YVgXDzwdUl1RJV9uzY'
+        chat_id: 649698155
+        parse_mode: 'HTML'
